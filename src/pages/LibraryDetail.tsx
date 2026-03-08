@@ -134,9 +134,25 @@ const LibraryDetail = () => {
                   {filteredBooks.length > 0 && (
                     <div className="p-4 flex gap-3 overflow-x-auto">
                       {filteredBooks.slice(0, 8).map(book => (
-                        <Link key={book.id} to={`/book/${book.id}`} className="flex-shrink-0">
+                        <Link
+                          key={book.id}
+                          to={`/book/${book.id}`}
+                          className="flex-shrink-0"
+                          draggable={!hasActiveFilters}
+                          onDragStart={(e) => {
+                            e.stopPropagation();
+                            handleDragStart(book.id, shelf.id);
+                          }}
+                          onDragOver={(e) => handleDragOver(e, book.id, shelf.id)}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleDrop(e, book.id, shelf.id);
+                          }}
+                          onDragEnd={handleDragEnd}
+                        >
                           <div
-                            className="w-12 h-40 rounded-sm shadow-md flex items-end justify-center pb-2 hover:scale-105 transition-transform cursor-pointer relative"
+                            className={`w-12 h-40 rounded-sm shadow-md flex items-end justify-center pb-2 hover:scale-105 transition-transform cursor-grab active:cursor-grabbing relative ${draggedId === book.id ? 'opacity-40' : ''}`}
                             style={{ backgroundColor: book.coverColor || 'hsl(25, 35%, 42%)' }}
                           >
                             <span className="text-[8px] text-primary-foreground font-body writing-vertical transform rotate-180 truncate max-h-32 px-0.5"
