@@ -211,6 +211,10 @@ const BookDetail = () => {
                 <Input placeholder="ISBN" value={editForm.isbn} onChange={e => setEditForm((f: any) => ({ ...f, isbn: e.target.value }))} className="bg-vintage-paper border-border" />
               </div>
               <Input type="number" step="0.01" placeholder="Valor pago (R$)" value={editForm.pricePaid || ''} onChange={e => setEditForm((f: any) => ({ ...f, pricePaid: Number(e.target.value) }))} className="bg-vintage-paper border-border" />
+              <div>
+                <Label className="font-body text-sm text-muted-foreground mb-1 block">Posição na estante (1-{book ? getBooksForShelf(book.shelfId).length : 1})</Label>
+                <Input type="number" min={1} value={editForm.positionOnShelf || 1} onChange={e => setEditForm((f: any) => ({ ...f, positionOnShelf: Number(e.target.value) }))} className="bg-vintage-paper border-border" />
+              </div>
               <div className="flex items-center gap-3">
                 <Switch checked={editForm.isRead} onCheckedChange={(v: boolean) => setEditForm((f: any) => ({ ...f, isRead: v }))} />
                 <Label className="font-body">Já li este livro</Label>

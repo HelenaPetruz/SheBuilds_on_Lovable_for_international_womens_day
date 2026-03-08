@@ -135,6 +135,7 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
       addLibrary, updateLibrary, deleteLibrary,
       addShelf, updateShelf, deleteShelf,
       addBook, updateBook, deleteBook,
+      reorderBooks, moveBookToPosition,
       loanBook, returnBook,
       getLibrary, getShelf, getBook,
       getShelvesForLibrary, getBooksForShelf, getBooksForLibrary,
