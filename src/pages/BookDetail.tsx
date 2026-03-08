@@ -30,7 +30,11 @@ const BookDetail = () => {
   if (!book) return <div className="min-h-screen flex items-center justify-center text-muted-foreground font-body">Livro não encontrado</div>;
 
   const handleSave = () => {
-    updateBook(editForm);
+    const positionChanged = editForm.positionOnShelf !== book.positionOnShelf;
+    updateBook({ ...editForm, positionOnShelf: book.positionOnShelf });
+    if (positionChanged) {
+      moveBookToPosition(book.id, editForm.positionOnShelf);
+    }
     setEditing(false);
   };
 
