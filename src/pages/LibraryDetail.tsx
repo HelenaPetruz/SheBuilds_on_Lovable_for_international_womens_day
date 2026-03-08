@@ -10,10 +10,12 @@ import { BookFilters, filterBooks, defaultFilters, type BookFilterState } from '
 const LibraryDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getLibrary, getShelvesForLibrary, getBooksForShelf, getBooksForLibrary, addShelf, deleteShelf, getLibraryValue, getTotalBooks } = useLibrary();
+  const { getLibrary, getShelvesForLibrary, getBooksForShelf, getBooksForLibrary, addShelf, deleteShelf, getLibraryValue, getTotalBooks, reorderBooks } = useLibrary();
   const [open, setOpen] = useState(false);
   const [shelfName, setShelfName] = useState('');
   const [filters, setFilters] = useState<BookFilterState>(defaultFilters);
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dragShelfId, setDragShelfId] = useState<string | null>(null);
 
   const library = getLibrary(id!);
   if (!library) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Biblioteca não encontrada</div>;
