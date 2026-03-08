@@ -60,7 +60,7 @@ const ShelfDetail = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-display font-bold text-foreground">{shelf.name}</h1>
-              <p className="text-muted-foreground mt-1 font-body">{books.length} livros nesta estante</p>
+              <p className="text-muted-foreground mt-1 font-body">{allBooks.length} livros nesta estante</p>
             </div>
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
