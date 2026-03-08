@@ -19,6 +19,9 @@ const LibraryDetail = () => {
   if (!library) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Biblioteca não encontrada</div>;
 
   const shelves = getShelvesForLibrary(id!);
+  const allLibraryBooks = getBooksForLibrary(id!);
+  const hasAnyBooks = allLibraryBooks.length > 0;
+  const hasActiveFilters = filters.search || filters.genre || filters.status || filters.readStatus;
 
   const handleAddShelf = () => {
     if (!shelfName.trim()) return;
