@@ -41,7 +41,7 @@ const ShelfDetail = () => {
       ...form,
       shelfId: shelfId!,
       libraryId: libraryId!,
-      positionOnShelf: books.length + 1,
+      positionOnShelf: allBooks.length + 1,
       status: 'available',
       loanedTo: '',
       loanDate: '',
