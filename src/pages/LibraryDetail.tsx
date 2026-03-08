@@ -90,7 +90,7 @@ const LibraryDetail = () => {
                     <Link to={`/library/${id}/shelf/${shelf.id}`} className="flex items-center gap-2 hover:text-vintage-spine transition-colors">
                       <Layers className="h-5 w-5 text-vintage-gold" />
                       <h3 className="text-lg font-display font-semibold">{shelf.name}</h3>
-                      <span className="text-sm text-muted-foreground">({shelfBooks.length} livros)</span>
+                      <span className="text-sm text-muted-foreground">({filteredBooks.length}{hasActiveFilters ? `/${shelfBooks.length}` : ''} livros)</span>
                     </Link>
                     <div className="flex gap-2">
                       <Link to={`/library/${id}/shelf/${shelf.id}`}>
