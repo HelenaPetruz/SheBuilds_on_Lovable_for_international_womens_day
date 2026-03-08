@@ -5,10 +5,11 @@ import { Plus, ArrowLeft } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { GenreCombobox } from '@/components/GenreCombobox';
+import { BookFilters, filterBooks, defaultFilters, type BookFilterState } from '@/components/BookFilters';
 
 const COVER_COLORS = [
   'hsl(25, 35%, 42%)', 'hsl(0, 40%, 35%)', 'hsl(210, 30%, 35%)',
