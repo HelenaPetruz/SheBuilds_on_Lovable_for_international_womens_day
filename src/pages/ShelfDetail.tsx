@@ -128,6 +128,10 @@ const ShelfDetail = () => {
             <p className="text-2xl font-display text-muted-foreground mb-2">Estante vazia</p>
             <p className="text-muted-foreground font-body">Adicione livros a esta estante.</p>
           </div>
+        ) : books.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground font-body">Nenhum livro encontrado com esses filtros.</p>
+          </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {books.map(book => (
