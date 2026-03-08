@@ -15,7 +15,7 @@ import { ptBR } from 'date-fns/locale';
 const BookDetail = () => {
   const { bookId } = useParams<{ bookId: string }>();
   const navigate = useNavigate();
-  const { getBook, getShelf, getLibrary, updateBook, deleteBook, loanBook, returnBook, getLoanHistory } = useLibrary();
+  const { getBook, getShelf, getLibrary, updateBook, deleteBook, loanBook, returnBook, getLoanHistory, moveBookToPosition, getBooksForShelf } = useLibrary();
 
   const book = getBook(bookId!);
   const shelf = book ? getShelf(book.shelfId) : undefined;
