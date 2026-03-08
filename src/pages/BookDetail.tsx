@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { GenreCombobox } from '@/components/GenreCombobox';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -200,7 +201,7 @@ const BookDetail = () => {
             <div className="space-y-3 pt-2">
               <Input placeholder="Título" value={editForm.title} onChange={e => setEditForm((f: any) => ({ ...f, title: e.target.value }))} className="bg-vintage-paper border-border" />
               <Input placeholder="Autor" value={editForm.author} onChange={e => setEditForm((f: any) => ({ ...f, author: e.target.value }))} className="bg-vintage-paper border-border" />
-              <Input placeholder="Gênero" value={editForm.genre} onChange={e => setEditForm((f: any) => ({ ...f, genre: e.target.value }))} className="bg-vintage-paper border-border" />
+              <GenreCombobox value={editForm.genre} onChange={v => setEditForm((f: any) => ({ ...f, genre: v }))} />
               <div className="grid grid-cols-2 gap-3">
                 <Input type="number" placeholder="Páginas" value={editForm.pages || ''} onChange={e => setEditForm((f: any) => ({ ...f, pages: Number(e.target.value) }))} className="bg-vintage-paper border-border" />
                 <Input placeholder="ISBN" value={editForm.isbn} onChange={e => setEditForm((f: any) => ({ ...f, isbn: e.target.value }))} className="bg-vintage-paper border-border" />

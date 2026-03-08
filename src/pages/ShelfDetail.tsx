@@ -5,10 +5,11 @@ import { Plus, ArrowLeft } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { GenreCombobox } from '@/components/GenreCombobox';
+import { BookFilters, filterBooks, defaultFilters, type BookFilterState } from '@/components/BookFilters';
 
 const COVER_COLORS = [
   'hsl(25, 35%, 42%)', 'hsl(0, 40%, 35%)', 'hsl(210, 30%, 35%)',
@@ -21,6 +22,7 @@ const ShelfDetail = () => {
   const navigate = useNavigate();
   const { getLibrary, getShelf, getBooksForShelf, addBook } = useLibrary();
   const [open, setOpen] = useState(false);
+  const [filters, setFilters] = useState<BookFilterState>(defaultFilters);
   const [form, setForm] = useState({
     title: '', author: '', genre: '', pages: 0, isbn: '',
     pricePaid: 0, isRead: false, rating: 0, notes: '', coverColor: COVER_COLORS[0],
@@ -30,7 +32,8 @@ const ShelfDetail = () => {
   const shelf = getShelf(shelfId!);
   if (!library || !shelf) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Não encontrado</div>;
 
-  const books = getBooksForShelf(shelfId!);
+  const allBooks = getBooksForShelf(shelfId!);
+  const books = filterBooks(allBooks, filters);
 
   const handleAdd = () => {
     if (!form.title.trim()) return;
@@ -38,7 +41,7 @@ const ShelfDetail = () => {
       ...form,
       shelfId: shelfId!,
       libraryId: libraryId!,
-      positionOnShelf: books.length + 1,
+      positionOnShelf: allBooks.length + 1,
       status: 'available',
       loanedTo: '',
       loanDate: '',
@@ -57,7 +60,7 @@ const ShelfDetail = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-display font-bold text-foreground">{shelf.name}</h1>
-              <p className="text-muted-foreground mt-1 font-body">{books.length} livros nesta estante</p>
+              <p className="text-muted-foreground mt-1 font-body">{allBooks.length} livros nesta estante</p>
             </div>
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
@@ -72,7 +75,7 @@ const ShelfDetail = () => {
                 <div className="space-y-3 pt-2">
                   <Input placeholder="Título *" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} className="bg-vintage-paper border-border" />
                   <Input placeholder="Autor" value={form.author} onChange={e => setForm(f => ({ ...f, author: e.target.value }))} className="bg-vintage-paper border-border" />
-                  <Input placeholder="Gênero" value={form.genre} onChange={e => setForm(f => ({ ...f, genre: e.target.value }))} className="bg-vintage-paper border-border" />
+                  <GenreCombobox value={form.genre} onChange={v => setForm(f => ({ ...f, genre: v }))} />
                   <div className="grid grid-cols-2 gap-3">
                     <Input type="number" placeholder="Páginas" value={form.pages || ''} onChange={e => setForm(f => ({ ...f, pages: Number(e.target.value) }))} className="bg-vintage-paper border-border" />
                     <Input placeholder="ISBN" value={form.isbn} onChange={e => setForm(f => ({ ...f, isbn: e.target.value }))} className="bg-vintage-paper border-border" />
@@ -115,10 +118,19 @@ const ShelfDetail = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        {books.length === 0 ? (
+        {allBooks.length > 0 && (
+          <div className="mb-6">
+            <BookFilters filters={filters} onChange={setFilters} />
+          </div>
+        )}
+        {books.length === 0 && allBooks.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-2xl font-display text-muted-foreground mb-2">Estante vazia</p>
             <p className="text-muted-foreground font-body">Adicione livros a esta estante.</p>
+          </div>
+        ) : books.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground font-body">Nenhum livro encontrado com esses filtros.</p>
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

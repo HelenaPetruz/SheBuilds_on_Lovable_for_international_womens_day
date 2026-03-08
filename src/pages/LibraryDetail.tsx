@@ -5,18 +5,23 @@ import { Plus, ArrowLeft, BookOpen, Layers } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { BookFilters, filterBooks, defaultFilters, type BookFilterState } from '@/components/BookFilters';
 
 const LibraryDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getLibrary, getShelvesForLibrary, getBooksForShelf, addShelf, deleteShelf, getLibraryValue, getTotalBooks } = useLibrary();
+  const { getLibrary, getShelvesForLibrary, getBooksForShelf, getBooksForLibrary, addShelf, deleteShelf, getLibraryValue, getTotalBooks } = useLibrary();
   const [open, setOpen] = useState(false);
   const [shelfName, setShelfName] = useState('');
+  const [filters, setFilters] = useState<BookFilterState>(defaultFilters);
 
   const library = getLibrary(id!);
   if (!library) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Biblioteca não encontrada</div>;
 
   const shelves = getShelvesForLibrary(id!);
+  const allLibraryBooks = getBooksForLibrary(id!);
+  const hasAnyBooks = allLibraryBooks.length > 0;
+  const hasActiveFilters = filters.search || filters.genre || filters.status || filters.readStatus;
 
   const handleAddShelf = () => {
     if (!shelfName.trim()) return;
@@ -62,6 +67,11 @@ const LibraryDetail = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {hasAnyBooks && (
+          <div className="mb-6">
+            <BookFilters filters={filters} onChange={setFilters} />
+          </div>
+        )}
         {shelves.length === 0 ? (
           <div className="text-center py-20">
             <Layers className="h-16 w-16 mx-auto text-muted-foreground/40 mb-4" />
@@ -72,13 +82,15 @@ const LibraryDetail = () => {
           <div className="space-y-6">
             {shelves.map(shelf => {
               const shelfBooks = getBooksForShelf(shelf.id);
+              const filteredBooks = hasActiveFilters ? filterBooks(shelfBooks, filters) : shelfBooks;
+              if (hasActiveFilters && filteredBooks.length === 0) return null;
               return (
                 <div key={shelf.id} className="bg-card border border-border rounded-lg overflow-hidden">
                   <div className="flex items-center justify-between px-5 py-4 bg-secondary/50 border-b border-border">
                     <Link to={`/library/${id}/shelf/${shelf.id}`} className="flex items-center gap-2 hover:text-vintage-spine transition-colors">
                       <Layers className="h-5 w-5 text-vintage-gold" />
                       <h3 className="text-lg font-display font-semibold">{shelf.name}</h3>
-                      <span className="text-sm text-muted-foreground">({shelfBooks.length} livros)</span>
+                      <span className="text-sm text-muted-foreground">({filteredBooks.length}{hasActiveFilters ? `/${shelfBooks.length}` : ''} livros)</span>
                     </Link>
                     <div className="flex gap-2">
                       <Link to={`/library/${id}/shelf/${shelf.id}`}>
@@ -87,9 +99,9 @@ const LibraryDetail = () => {
                       <button onClick={() => deleteShelf(shelf.id)} className="text-muted-foreground hover:text-destructive text-sm px-2">✕</button>
                     </div>
                   </div>
-                  {shelfBooks.length > 0 && (
+                  {filteredBooks.length > 0 && (
                     <div className="p-4 flex gap-3 overflow-x-auto">
-                      {shelfBooks.slice(0, 8).map(book => (
+                      {filteredBooks.slice(0, 8).map(book => (
                         <Link key={book.id} to={`/book/${book.id}`} className="flex-shrink-0">
                           <div
                             className="w-12 h-40 rounded-sm shadow-md flex items-end justify-center pb-2 hover:scale-105 transition-transform cursor-pointer relative"
@@ -106,9 +118,9 @@ const LibraryDetail = () => {
                           </div>
                         </Link>
                       ))}
-                      {shelfBooks.length > 8 && (
+                      {filteredBooks.length > 8 && (
                         <div className="flex-shrink-0 w-12 h-40 rounded-sm border border-dashed border-border flex items-center justify-center">
-                          <span className="text-xs text-muted-foreground">+{shelfBooks.length - 8}</span>
+                          <span className="text-xs text-muted-foreground">+{filteredBooks.length - 8}</span>
                         </div>
                       )}
                     </div>
