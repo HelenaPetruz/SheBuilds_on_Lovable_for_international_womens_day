@@ -99,9 +99,9 @@ const LibraryDetail = () => {
                       <button onClick={() => deleteShelf(shelf.id)} className="text-muted-foreground hover:text-destructive text-sm px-2">✕</button>
                     </div>
                   </div>
-                  {shelfBooks.length > 0 && (
+                  {filteredBooks.length > 0 && (
                     <div className="p-4 flex gap-3 overflow-x-auto">
-                      {shelfBooks.slice(0, 8).map(book => (
+                      {filteredBooks.slice(0, 8).map(book => (
                         <Link key={book.id} to={`/book/${book.id}`} className="flex-shrink-0">
                           <div
                             className="w-12 h-40 rounded-sm shadow-md flex items-end justify-center pb-2 hover:scale-105 transition-transform cursor-pointer relative"
