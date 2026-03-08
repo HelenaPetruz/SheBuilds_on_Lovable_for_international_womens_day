@@ -118,7 +118,12 @@ const ShelfDetail = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        {books.length === 0 ? (
+        {allBooks.length > 0 && (
+          <div className="mb-6">
+            <BookFilters filters={filters} onChange={setFilters} />
+          </div>
+        )}
+        {books.length === 0 && allBooks.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-2xl font-display text-muted-foreground mb-2">Estante vazia</p>
             <p className="text-muted-foreground font-body">Adicione livros a esta estante.</p>
