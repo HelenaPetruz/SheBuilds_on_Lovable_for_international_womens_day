@@ -5,6 +5,7 @@ import { Plus, ArrowLeft, BookOpen, Layers } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { BookFilters, filterBooks, defaultFilters, type BookFilterState } from '@/components/BookFilters';
 
 const LibraryDetail = () => {
   const { id } = useParams<{ id: string }>();
