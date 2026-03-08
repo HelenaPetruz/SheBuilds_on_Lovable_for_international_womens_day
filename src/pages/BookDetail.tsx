@@ -17,16 +17,16 @@ const BookDetail = () => {
   const { getBook, getShelf, getLibrary, updateBook, deleteBook, loanBook, returnBook, getLoanHistory } = useLibrary();
 
   const book = getBook(bookId!);
-  if (!book) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Livro não encontrado</div>;
-
-  const shelf = getShelf(book.shelfId);
-  const library = getLibrary(book.libraryId);
+  const shelf = book ? getShelf(book.shelfId) : undefined;
+  const library = book ? getLibrary(book.libraryId) : undefined;
   const loanHistory = getLoanHistory(bookId!);
 
   const [editing, setEditing] = useState(false);
-  const [editForm, setEditForm] = useState(book);
+  const [editForm, setEditForm] = useState(book || {} as any);
   const [loanOpen, setLoanOpen] = useState(false);
   const [borrower, setBorrower] = useState('');
+
+  if (!book) return <div className="min-h-screen flex items-center justify-center text-muted-foreground font-body">Livro não encontrado</div>;
 
   const handleSave = () => {
     updateBook(editForm);
@@ -40,9 +40,7 @@ const BookDetail = () => {
     setLoanOpen(false);
   };
 
-  const handleReturn = () => {
-    returnBook(bookId!);
-  };
+  const handleReturn = () => returnBook(bookId!);
 
   const handleDelete = () => {
     deleteBook(bookId!);
@@ -66,7 +64,6 @@ const BookDetail = () => {
 
       <main className="container mx-auto px-4 py-8 max-w-3xl">
         <div className="bg-card border border-border rounded-lg overflow-hidden">
-          {/* Header section */}
           <div className="p-6 flex gap-6 items-start border-b border-border">
             <div className="w-20 h-52 rounded shadow-lg flex-shrink-0 flex items-end justify-center pb-3"
               style={{ backgroundColor: book.coverColor || 'hsl(25, 35%, 42%)' }}
@@ -90,14 +87,11 @@ const BookDetail = () => {
                   </Button>
                 </div>
               </div>
-
               <div className="mt-4 flex flex-wrap gap-2">
                 {book.status === 'available' ? (
                   <span className="text-xs px-3 py-1 rounded-full bg-secondary text-secondary-foreground font-body">📚 Na estante</span>
                 ) : (
-                  <span className="text-xs px-3 py-1 rounded-full bg-vintage-gold/20 text-vintage-spine font-body">
-                    📤 Emprestado para {book.loanedTo}
-                  </span>
+                  <span className="text-xs px-3 py-1 rounded-full bg-vintage-gold/20 text-vintage-spine font-body">📤 Emprestado para {book.loanedTo}</span>
                 )}
                 {book.isRead ? (
                   <span className="text-xs px-3 py-1 rounded-full bg-secondary text-secondary-foreground font-body">✓ Lido</span>
@@ -106,16 +100,12 @@ const BookDetail = () => {
                 )}
                 {book.genre && <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground font-body">{book.genre}</span>}
               </div>
-
               {book.isRead && book.rating > 0 && (
-                <div className="mt-3 text-vintage-gold text-lg">
-                  {'★'.repeat(book.rating)}{'☆'.repeat(5 - book.rating)}
-                </div>
+                <div className="mt-3 text-vintage-gold text-lg">{'★'.repeat(book.rating)}{'☆'.repeat(5 - book.rating)}</div>
               )}
             </div>
           </div>
 
-          {/* Info grid */}
           <div className="p-6 grid grid-cols-2 sm:grid-cols-4 gap-4 border-b border-border">
             <div className="text-center">
               <DollarSign className="h-5 w-5 mx-auto text-vintage-gold mb-1" />
@@ -144,7 +134,6 @@ const BookDetail = () => {
               <p className="text-sm text-muted-foreground font-body">ISBN: <span className="text-foreground">{book.isbn}</span></p>
             </div>
           )}
-
           {book.notes && (
             <div className="px-6 py-4 border-b border-border">
               <h3 className="font-display font-semibold text-sm mb-2 text-muted-foreground">Notas pessoais</h3>
@@ -152,7 +141,6 @@ const BookDetail = () => {
             </div>
           )}
 
-          {/* Loan actions */}
           <div className="px-6 py-4 border-b border-border">
             <h3 className="font-display font-semibold mb-3">Empréstimo</h3>
             {book.status === 'available' ? (
@@ -171,7 +159,7 @@ const BookDetail = () => {
                 </DialogContent>
               </Dialog>
             ) : (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 flex-wrap">
                 <p className="text-sm text-muted-foreground font-body">
                   Emprestado para <strong className="text-foreground">{book.loanedTo}</strong>
                   {book.loanDate && <> em {fmtDate(book.loanDate)}</>}
@@ -181,7 +169,6 @@ const BookDetail = () => {
             )}
           </div>
 
-          {/* Loan history */}
           {loanHistory.length > 0 && (
             <div className="px-6 py-4">
               <h3 className="font-display font-semibold mb-3 flex items-center gap-2">
@@ -189,13 +176,13 @@ const BookDetail = () => {
               </h3>
               <div className="space-y-2">
                 {loanHistory.map(record => (
-                  <div key={record.id} className="flex items-center justify-between text-sm py-2 border-b border-border last:border-0">
+                  <div key={record.id} className="flex items-center justify-between text-sm py-2 border-b border-border last:border-0 gap-2">
                     <span className="font-body">{record.borrowerName}</span>
                     <div className="text-muted-foreground font-body text-xs text-right">
                       <div>Emprestado: {fmtDate(record.loanDate)}</div>
                       {record.returned && record.returnDate && <div>Devolvido: {fmtDate(record.returnDate)}</div>}
                     </div>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${record.returned ? 'bg-secondary text-secondary-foreground' : 'bg-vintage-gold/20 text-vintage-spine'}`}>
+                    <span className={`text-xs px-2 py-0.5 rounded-full flex-shrink-0 ${record.returned ? 'bg-secondary text-secondary-foreground' : 'bg-vintage-gold/20 text-vintage-spine'}`}>
                       {record.returned ? 'Devolvido' : 'Pendente'}
                     </span>
                   </div>
@@ -205,35 +192,34 @@ const BookDetail = () => {
           )}
         </div>
 
-        {/* Edit dialog */}
         <Dialog open={editing} onOpenChange={setEditing}>
           <DialogContent className="bg-card border-border max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="font-display text-xl">Editar Livro</DialogTitle>
             </DialogHeader>
             <div className="space-y-3 pt-2">
-              <Input placeholder="Título" value={editForm.title} onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))} className="bg-vintage-paper border-border" />
-              <Input placeholder="Autor" value={editForm.author} onChange={e => setEditForm(f => ({ ...f, author: e.target.value }))} className="bg-vintage-paper border-border" />
-              <Input placeholder="Gênero" value={editForm.genre} onChange={e => setEditForm(f => ({ ...f, genre: e.target.value }))} className="bg-vintage-paper border-border" />
+              <Input placeholder="Título" value={editForm.title} onChange={e => setEditForm((f: any) => ({ ...f, title: e.target.value }))} className="bg-vintage-paper border-border" />
+              <Input placeholder="Autor" value={editForm.author} onChange={e => setEditForm((f: any) => ({ ...f, author: e.target.value }))} className="bg-vintage-paper border-border" />
+              <Input placeholder="Gênero" value={editForm.genre} onChange={e => setEditForm((f: any) => ({ ...f, genre: e.target.value }))} className="bg-vintage-paper border-border" />
               <div className="grid grid-cols-2 gap-3">
-                <Input type="number" placeholder="Páginas" value={editForm.pages || ''} onChange={e => setEditForm(f => ({ ...f, pages: Number(e.target.value) }))} className="bg-vintage-paper border-border" />
-                <Input placeholder="ISBN" value={editForm.isbn} onChange={e => setEditForm(f => ({ ...f, isbn: e.target.value }))} className="bg-vintage-paper border-border" />
+                <Input type="number" placeholder="Páginas" value={editForm.pages || ''} onChange={e => setEditForm((f: any) => ({ ...f, pages: Number(e.target.value) }))} className="bg-vintage-paper border-border" />
+                <Input placeholder="ISBN" value={editForm.isbn} onChange={e => setEditForm((f: any) => ({ ...f, isbn: e.target.value }))} className="bg-vintage-paper border-border" />
               </div>
-              <Input type="number" step="0.01" placeholder="Valor pago (R$)" value={editForm.pricePaid || ''} onChange={e => setEditForm(f => ({ ...f, pricePaid: Number(e.target.value) }))} className="bg-vintage-paper border-border" />
+              <Input type="number" step="0.01" placeholder="Valor pago (R$)" value={editForm.pricePaid || ''} onChange={e => setEditForm((f: any) => ({ ...f, pricePaid: Number(e.target.value) }))} className="bg-vintage-paper border-border" />
               <div className="flex items-center gap-3">
-                <Switch checked={editForm.isRead} onCheckedChange={v => setEditForm(f => ({ ...f, isRead: v }))} />
+                <Switch checked={editForm.isRead} onCheckedChange={(v: boolean) => setEditForm((f: any) => ({ ...f, isRead: v }))} />
                 <Label className="font-body">Já li este livro</Label>
               </div>
               {editForm.isRead && (
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map(star => (
-                    <button key={star} onClick={() => setEditForm(f => ({ ...f, rating: star }))}
+                    <button key={star} onClick={() => setEditForm((f: any) => ({ ...f, rating: star }))}
                       className={`text-2xl ${star <= editForm.rating ? 'text-vintage-gold' : 'text-muted-foreground/30'}`}
                     >★</button>
                   ))}
                 </div>
               )}
-              <Textarea placeholder="Notas pessoais" value={editForm.notes} onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} className="bg-vintage-paper border-border" />
+              <Textarea placeholder="Notas pessoais" value={editForm.notes} onChange={e => setEditForm((f: any) => ({ ...f, notes: e.target.value }))} className="bg-vintage-paper border-border" />
               <Button onClick={handleSave} className="w-full bg-primary text-primary-foreground hover:bg-vintage-leather">Salvar</Button>
             </div>
           </DialogContent>
