@@ -20,9 +20,10 @@ const COVER_COLORS = [
 const ShelfDetail = () => {
   const { id: libraryId, shelfId } = useParams<{ id: string; shelfId: string }>();
   const navigate = useNavigate();
-  const { getLibrary, getShelf, getBooksForShelf, addBook } = useLibrary();
+  const { getLibrary, getShelf, getBooksForShelf, addBook, reorderBooks } = useLibrary();
   const [open, setOpen] = useState(false);
   const [filters, setFilters] = useState<BookFilterState>(defaultFilters);
+  const [draggedId, setDraggedId] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: '', author: '', genre: '', pages: 0, isbn: '',
     pricePaid: 0, isRead: false, rating: 0, notes: '', coverColor: COVER_COLORS[0],
