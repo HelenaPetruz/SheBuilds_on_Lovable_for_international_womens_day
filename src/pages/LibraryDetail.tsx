@@ -32,6 +32,36 @@ const LibraryDetail = () => {
     setOpen(false);
   };
 
+  const handleDragStart = (bookId: string, shelfId: string) => {
+    setDraggedId(bookId);
+    setDragShelfId(shelfId);
+  };
+
+  const handleDragOver = (e: React.DragEvent, targetBookId: string, targetShelfId: string) => {
+    e.preventDefault();
+    if (!draggedId || draggedId === targetBookId || dragShelfId !== targetShelfId || hasActiveFilters) return;
+  };
+
+  const handleDrop = (e: React.DragEvent, targetBookId: string, targetShelfId: string) => {
+    e.preventDefault();
+    if (!draggedId || draggedId === targetBookId || dragShelfId !== targetShelfId || hasActiveFilters) return;
+    const shelfBooks = getBooksForShelf(targetShelfId);
+    const currentOrder = shelfBooks.map(b => b.id);
+    const fromIdx = currentOrder.indexOf(draggedId);
+    const toIdx = currentOrder.indexOf(targetBookId);
+    if (fromIdx < 0 || toIdx < 0) return;
+    currentOrder.splice(fromIdx, 1);
+    currentOrder.splice(toIdx, 0, draggedId);
+    reorderBooks(targetShelfId, currentOrder);
+    setDraggedId(null);
+    setDragShelfId(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedId(null);
+    setDragShelfId(null);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
