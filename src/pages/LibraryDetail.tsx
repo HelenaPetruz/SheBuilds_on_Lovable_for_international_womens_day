@@ -118,9 +118,9 @@ const LibraryDetail = () => {
                           </div>
                         </Link>
                       ))}
-                      {shelfBooks.length > 8 && (
+                      {filteredBooks.length > 8 && (
                         <div className="flex-shrink-0 w-12 h-40 rounded-sm border border-dashed border-border flex items-center justify-center">
-                          <span className="text-xs text-muted-foreground">+{shelfBooks.length - 8}</span>
+                          <span className="text-xs text-muted-foreground">+{filteredBooks.length - 8}</span>
                         </div>
                       )}
                     </div>
