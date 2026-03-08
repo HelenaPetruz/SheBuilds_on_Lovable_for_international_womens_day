@@ -22,6 +22,7 @@ const ShelfDetail = () => {
   const navigate = useNavigate();
   const { getLibrary, getShelf, getBooksForShelf, addBook } = useLibrary();
   const [open, setOpen] = useState(false);
+  const [filters, setFilters] = useState<BookFilterState>(defaultFilters);
   const [form, setForm] = useState({
     title: '', author: '', genre: '', pages: 0, isbn: '',
     pricePaid: 0, isRead: false, rating: 0, notes: '', coverColor: COVER_COLORS[0],
