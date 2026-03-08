@@ -67,6 +67,11 @@ const LibraryDetail = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {hasAnyBooks && (
+          <div className="mb-6">
+            <BookFilters filters={filters} onChange={setFilters} />
+          </div>
+        )}
         {shelves.length === 0 ? (
           <div className="text-center py-20">
             <Layers className="h-16 w-16 mx-auto text-muted-foreground/40 mb-4" />
@@ -77,6 +82,8 @@ const LibraryDetail = () => {
           <div className="space-y-6">
             {shelves.map(shelf => {
               const shelfBooks = getBooksForShelf(shelf.id);
+              const filteredBooks = hasActiveFilters ? filterBooks(shelfBooks, filters) : shelfBooks;
+              if (hasActiveFilters && filteredBooks.length === 0) return null;
               return (
                 <div key={shelf.id} className="bg-card border border-border rounded-lg overflow-hidden">
                   <div className="flex items-center justify-between px-5 py-4 bg-secondary/50 border-b border-border">
