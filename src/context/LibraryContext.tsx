@@ -86,6 +86,29 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
     setBooks(prev => prev.filter(b => b.id !== id));
   }, []);
 
+  const reorderBooks = useCallback((shelfId: string, orderedBookIds: string[]) => {
+    setBooks(prev => prev.map(b => {
+      if (b.shelfId !== shelfId) return b;
+      const idx = orderedBookIds.indexOf(b.id);
+      return idx >= 0 ? { ...b, positionOnShelf: idx + 1 } : b;
+    }));
+  }, []);
+
+  const moveBookToPosition = useCallback((bookId: string, newPosition: number) => {
+    setBooks(prev => {
+      const book = prev.find(b => b.id === bookId);
+      if (!book) return prev;
+      const shelfBooks = prev.filter(b => b.shelfId === book.shelfId && b.id !== bookId).sort((a, b) => a.positionOnShelf - b.positionOnShelf);
+      const clamped = Math.max(1, Math.min(newPosition, shelfBooks.length + 1));
+      shelfBooks.splice(clamped - 1, 0, book);
+      return prev.map(b => {
+        if (b.shelfId !== book.shelfId) return b;
+        const idx = shelfBooks.findIndex(sb => sb.id === b.id);
+        return idx >= 0 ? { ...b, positionOnShelf: idx + 1 } : b;
+      });
+    });
+  }, []);
+
   const loanBook = useCallback((bookId: string, borrowerName: string) => {
     setBooks(prev => prev.map(b => b.id === bookId ? { ...b, status: 'loaned' as const, loanedTo: borrowerName, loanDate: new Date().toISOString() } : b));
     setLoanRecords(prev => [...prev, { id: genId(), bookId, borrowerName, loanDate: new Date().toISOString(), returnDate: null, returned: false }]);
