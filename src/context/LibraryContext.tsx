@@ -15,6 +15,8 @@ interface LibraryContextType {
   addBook: (book: Omit<Book, 'id' | 'createdAt'>) => void;
   updateBook: (book: Book) => void;
   deleteBook: (id: string) => void;
+  reorderBooks: (shelfId: string, orderedBookIds: string[]) => void;
+  moveBookToPosition: (bookId: string, newPosition: number) => void;
   loanBook: (bookId: string, borrowerName: string) => void;
   returnBook: (bookId: string) => void;
   getLibrary: (id: string) => Library | undefined;
