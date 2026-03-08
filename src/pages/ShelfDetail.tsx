@@ -161,30 +161,46 @@ const ShelfDetail = () => {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {books.map(book => (
-              <Link key={book.id} to={`/book/${book.id}`}
-                className="group bg-card border border-border rounded-lg p-4 hover:shadow-lg hover:border-vintage-gold/50 transition-all duration-300 flex gap-4"
+              <div
+                key={book.id}
+                draggable={!hasActiveFilters}
+                onDragStart={() => handleDragStart(book.id)}
+                onDragOver={e => handleDragOver(e, book.id)}
+                onDrop={e => handleDrop(e, book.id)}
+                onDragEnd={handleDragEnd}
+                className={`group bg-card border border-border rounded-lg p-4 hover:shadow-lg hover:border-vintage-gold/50 transition-all duration-300 flex gap-4 ${draggedId === book.id ? 'opacity-50 scale-95' : ''} ${!hasActiveFilters ? 'cursor-grab active:cursor-grabbing' : ''}`}
               >
-                <div className="w-10 h-32 rounded-sm flex-shrink-0 shadow-md"
-                  style={{ backgroundColor: book.coverColor || 'hsl(25, 35%, 42%)' }}
-                />
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-display font-semibold text-foreground group-hover:text-vintage-spine transition-colors truncate">{book.title}</h3>
-                  <p className="text-sm text-muted-foreground font-body truncate">{book.author}</p>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {book.isRead && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-body">Lido</span>
-                    )}
-                    {book.status === 'loaned' && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-vintage-gold/20 text-vintage-spine font-body">Emprestado</span>
+                {!hasActiveFilters && (
+                  <div className="flex items-center text-muted-foreground/40 -ml-1 mr-0">
+                    <GripVertical className="h-5 w-5" />
+                  </div>
+                )}
+                <Link to={`/book/${book.id}`} className="flex gap-4 flex-1 min-w-0">
+                  <div className="w-10 h-32 rounded-sm flex-shrink-0 shadow-md"
+                    style={{ backgroundColor: book.coverColor || 'hsl(25, 35%, 42%)' }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground/50 font-body">#{book.positionOnShelf}</span>
+                      <h3 className="font-display font-semibold text-foreground group-hover:text-vintage-spine transition-colors truncate">{book.title}</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground font-body truncate">{book.author}</p>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {book.isRead && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-body">Lido</span>
+                      )}
+                      {book.status === 'loaned' && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-vintage-gold/20 text-vintage-spine font-body">Emprestado</span>
+                      )}
+                    </div>
+                    {book.isRead && book.rating > 0 && (
+                      <div className="mt-1 text-vintage-gold text-sm">
+                        {'★'.repeat(book.rating)}{'☆'.repeat(5 - book.rating)}
+                      </div>
                     )}
                   </div>
-                  {book.isRead && book.rating > 0 && (
-                    <div className="mt-1 text-vintage-gold text-sm">
-                      {'★'.repeat(book.rating)}{'☆'.repeat(5 - book.rating)}
-                    </div>
-                  )}
-                </div>
-              </Link>
+                </Link>
+              </div>
             ))}
           </div>
         )}
