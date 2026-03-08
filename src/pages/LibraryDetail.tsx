@@ -10,10 +10,12 @@ import { BookFilters, filterBooks, defaultFilters, type BookFilterState } from '
 const LibraryDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getLibrary, getShelvesForLibrary, getBooksForShelf, getBooksForLibrary, addShelf, deleteShelf, getLibraryValue, getTotalBooks } = useLibrary();
+  const { getLibrary, getShelvesForLibrary, getBooksForShelf, getBooksForLibrary, addShelf, deleteShelf, getLibraryValue, getTotalBooks, reorderBooks } = useLibrary();
   const [open, setOpen] = useState(false);
   const [shelfName, setShelfName] = useState('');
   const [filters, setFilters] = useState<BookFilterState>(defaultFilters);
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dragShelfId, setDragShelfId] = useState<string | null>(null);
 
   const library = getLibrary(id!);
   if (!library) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Biblioteca não encontrada</div>;
@@ -28,6 +30,36 @@ const LibraryDetail = () => {
     addShelf({ libraryId: id!, name: shelfName.trim(), position: shelves.length + 1 });
     setShelfName('');
     setOpen(false);
+  };
+
+  const handleDragStart = (bookId: string, shelfId: string) => {
+    setDraggedId(bookId);
+    setDragShelfId(shelfId);
+  };
+
+  const handleDragOver = (e: React.DragEvent, targetBookId: string, targetShelfId: string) => {
+    e.preventDefault();
+    if (!draggedId || draggedId === targetBookId || dragShelfId !== targetShelfId || hasActiveFilters) return;
+  };
+
+  const handleDrop = (e: React.DragEvent, targetBookId: string, targetShelfId: string) => {
+    e.preventDefault();
+    if (!draggedId || draggedId === targetBookId || dragShelfId !== targetShelfId || hasActiveFilters) return;
+    const shelfBooks = getBooksForShelf(targetShelfId);
+    const currentOrder = shelfBooks.map(b => b.id);
+    const fromIdx = currentOrder.indexOf(draggedId);
+    const toIdx = currentOrder.indexOf(targetBookId);
+    if (fromIdx < 0 || toIdx < 0) return;
+    currentOrder.splice(fromIdx, 1);
+    currentOrder.splice(toIdx, 0, draggedId);
+    reorderBooks(targetShelfId, currentOrder);
+    setDraggedId(null);
+    setDragShelfId(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedId(null);
+    setDragShelfId(null);
   };
 
   return (
@@ -102,9 +134,25 @@ const LibraryDetail = () => {
                   {filteredBooks.length > 0 && (
                     <div className="p-4 flex gap-3 overflow-x-auto">
                       {filteredBooks.slice(0, 8).map(book => (
-                        <Link key={book.id} to={`/book/${book.id}`} className="flex-shrink-0">
+                        <Link
+                          key={book.id}
+                          to={`/book/${book.id}`}
+                          className="flex-shrink-0"
+                          draggable={!hasActiveFilters}
+                          onDragStart={(e) => {
+                            e.stopPropagation();
+                            handleDragStart(book.id, shelf.id);
+                          }}
+                          onDragOver={(e) => handleDragOver(e, book.id, shelf.id)}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleDrop(e, book.id, shelf.id);
+                          }}
+                          onDragEnd={handleDragEnd}
+                        >
                           <div
-                            className="w-12 h-40 rounded-sm shadow-md flex items-end justify-center pb-2 hover:scale-105 transition-transform cursor-pointer relative"
+                            className={`w-12 h-40 rounded-sm shadow-md flex items-end justify-center pb-2 hover:scale-105 transition-transform cursor-grab active:cursor-grabbing relative ${draggedId === book.id ? 'opacity-40' : ''}`}
                             style={{ backgroundColor: book.coverColor || 'hsl(25, 35%, 42%)' }}
                           >
                             <span className="text-[8px] text-primary-foreground font-body writing-vertical transform rotate-180 truncate max-h-32 px-0.5"
