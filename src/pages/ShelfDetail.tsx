@@ -75,7 +75,7 @@ const ShelfDetail = () => {
                 <div className="space-y-3 pt-2">
                   <Input placeholder="Título *" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} className="bg-vintage-paper border-border" />
                   <Input placeholder="Autor" value={form.author} onChange={e => setForm(f => ({ ...f, author: e.target.value }))} className="bg-vintage-paper border-border" />
-                  <Input placeholder="Gênero" value={form.genre} onChange={e => setForm(f => ({ ...f, genre: e.target.value }))} className="bg-vintage-paper border-border" />
+                  <GenreCombobox value={form.genre} onChange={v => setForm(f => ({ ...f, genre: v }))} />
                   <div className="grid grid-cols-2 gap-3">
                     <Input type="number" placeholder="Páginas" value={form.pages || ''} onChange={e => setForm(f => ({ ...f, pages: Number(e.target.value) }))} className="bg-vintage-paper border-border" />
                     <Input placeholder="ISBN" value={form.isbn} onChange={e => setForm(f => ({ ...f, isbn: e.target.value }))} className="bg-vintage-paper border-border" />
