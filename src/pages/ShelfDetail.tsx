@@ -32,7 +32,8 @@ const ShelfDetail = () => {
   const shelf = getShelf(shelfId!);
   if (!library || !shelf) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Não encontrado</div>;
 
-  const books = getBooksForShelf(shelfId!);
+  const allBooks = getBooksForShelf(shelfId!);
+  const books = filterBooks(allBooks, filters);
 
   const handleAdd = () => {
     if (!form.title.trim()) return;
