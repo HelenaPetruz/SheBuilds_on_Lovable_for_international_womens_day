@@ -35,6 +35,31 @@ const ShelfDetail = () => {
 
   const allBooks = getBooksForShelf(shelfId!);
   const books = filterBooks(allBooks, filters);
+  const hasActiveFilters = filters.search || filters.genre || filters.status || filters.readStatus;
+
+  const handleDragStart = (bookId: string) => {
+    setDraggedId(bookId);
+  };
+
+  const handleDragOver = (e: React.DragEvent, targetBookId: string) => {
+    e.preventDefault();
+    if (!draggedId || draggedId === targetBookId || hasActiveFilters) return;
+  };
+
+  const handleDrop = (e: React.DragEvent, targetBookId: string) => {
+    e.preventDefault();
+    if (!draggedId || draggedId === targetBookId || hasActiveFilters) return;
+    const currentOrder = allBooks.map(b => b.id);
+    const fromIdx = currentOrder.indexOf(draggedId);
+    const toIdx = currentOrder.indexOf(targetBookId);
+    if (fromIdx < 0 || toIdx < 0) return;
+    currentOrder.splice(fromIdx, 1);
+    currentOrder.splice(toIdx, 0, draggedId);
+    reorderBooks(shelfId!, currentOrder);
+    setDraggedId(null);
+  };
+
+  const handleDragEnd = () => setDraggedId(null);
 
   const handleAdd = () => {
     if (!form.title.trim()) return;
